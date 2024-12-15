@@ -331,7 +331,7 @@ if __name__ == '__main__':
         if wines:
             for wine in wines:
                 st.subheader(wine['name'])
-          st.write(f"**Producer:** {wine['producer']}")
+                st.write(f"**Producer:** {wine['producer']}")
                 st.write(f"**Vintage:** {wine['vintage']}")
                 st.write(f"**Wine Type:** {wine['wine_type']}")
                 st.write(f"**Grape Varieties:** {', '.join(wine['grape_varieties']) if wine['grape_varieties'] else 'N/A'}")
