@@ -242,7 +242,7 @@ if __name__ == '__main__':
     tools = [add_wine_journal_entry]
     tool_executor = ToolExecutor(tools)
 
-  prompt = ChatPromptTemplate.from_messages([
+    prompt = ChatPromptTemplate.from_messages([
         SystemMessage(content="You are a helpful agent, that will follow user instructions"),
         MessagesPlaceholder(variable_name="chat_history"),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
@@ -260,7 +260,7 @@ if __name__ == '__main__':
     # Define chat history so the agent can keep track of previous prompts and actions
     chat_history = []
 
-  # Sidebar for adding wine entry
+    # Sidebar for adding wine entry
   with st.sidebar:
       st.header("Add New Wine Entry")
       uploaded_file = st.file_uploader("Upload Wine Label Image", type=["jpg", "jpeg", "png"])
