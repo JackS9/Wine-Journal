@@ -284,7 +284,7 @@ if __name__ == '__main__':
             form_data['grape_varieties'] = st.text_input("Grape Varieties (comma separated)")
             form_data['region'] = st.text_input("Region")
             form_data['country'] = st.text_input("Country")
-        form_data['appellation'] = st.text_input("Appellation")
+            form_data['appellation'] = st.text_input("Appellation")
             form_data['tasting_date'] = st.date_input("Tasting Date")
             form_data['tasting_notes'] = st.text_area("Tasting Notes")
             form_data['aromas'] = st.text_input("Aromas (comma separated)")
@@ -300,7 +300,7 @@ if __name__ == '__main__':
             form_data['purchase_location'] = st.text_input("Purchase Location")
             form_data['notes_metadata'] = st.text_input("Notes Metadata")
             form_data['related_urls'] = st.text_input("Related URLs (comma separated)")
-        submitted = st.form_submit_button("Add Wine Entry")
+            submitted = st.form_submit_button("Add Wine Entry")
         if submitted:
           # Convert the comma separated strings into proper lists
           if form_data['grape_varieties']:
@@ -326,9 +326,9 @@ if __name__ == '__main__':
   # Main area for displaying wine data
     st.header("Wine Journal Entries")
     with st.spinner("Loading wine entries..."):
-    wines = get_all_wines(engine)
+        wines = get_all_wines(engine)
 
-    if wines:
+        if wines:
         for wine in wines:
           st.subheader(wine['name'])
           st.write(f"**Producer:** {wine['producer']}")
