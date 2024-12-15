@@ -223,9 +223,13 @@ def get_all_wines(engine):
 
 if __name__ == '__main__':
   # Initialize Streamlit secrets from Replit secrets
-  for key in ["DATABASE_URL", "OPENAI_API_KEY"]:
-      if key in os.environ:
-          st.secrets[key] = os.environ[key]
+  if 'DATABASE_URL' not in st.secrets:
+      st.error("DATABASE_URL not found in secrets. Please add it in the Secrets tool.")
+      st.stop()
+  
+  if 'OPENAI_API_KEY' not in st.secrets:
+      st.error("OPENAI_API_KEY not found in secrets. Please add it in the Secrets tool.")
+      st.stop()
 
   st.title("Wine Journaling App")
 
