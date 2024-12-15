@@ -261,8 +261,8 @@ if __name__ == '__main__':
     chat_history = []
 
     # Sidebar for adding wine entry
-  with st.sidebar:
-      st.header("Add New Wine Entry")
+    with st.sidebar:
+        st.header("Add New Wine Entry")
       uploaded_file = st.file_uploader("Upload Wine Label Image", type=["jpg", "jpeg", "png"])
       #Initialize empty form data to hold the values of the fields
       form_data = {}
