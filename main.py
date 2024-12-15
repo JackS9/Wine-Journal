@@ -263,11 +263,11 @@ if __name__ == '__main__':
     # Sidebar for adding wine entry
     with st.sidebar:
         st.header("Add New Wine Entry")
-      uploaded_file = st.file_uploader("Upload Wine Label Image", type=["jpg", "jpeg", "png"])
-      #Initialize empty form data to hold the values of the fields
-      form_data = {}
+        uploaded_file = st.file_uploader("Upload Wine Label Image", type=["jpg", "jpeg", "png"])
+        #Initialize empty form data to hold the values of the fields
+        form_data = {}
 
-      if uploaded_file:
+        if uploaded_file:
           image = Image.open(uploaded_file)
           st.image(image, caption="Uploaded Wine Label", width=200)
           # Convert image to base64
