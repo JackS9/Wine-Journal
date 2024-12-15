@@ -280,27 +280,27 @@ if __name__ == '__main__':
       with st.form("add_wine_form"):
             form_data['name'] = st.text_input("Wine Name")
             form_data['producer'] = st.text_input("Producer")
-        form_data['vintage'] = st.number_input("Vintage", min_value=1000, max_value=2100, step=1, value=2023)
-        form_data['wine_type'] = st.text_input("Wine Type (Red, White, Rose, etc)")
-        form_data['grape_varieties'] = st.text_input("Grape Varieties (comma separated)")
-        form_data['region'] = st.text_input("Region")
-        form_data['country'] = st.text_input("Country")
+            form_data['vintage'] = st.number_input("Vintage", min_value=1000, max_value=2100, step=1, value=2023)
+            form_data['wine_type'] = st.text_input("Wine Type (Red, White, Rose, etc)")
+            form_data['grape_varieties'] = st.text_input("Grape Varieties (comma separated)")
+            form_data['region'] = st.text_input("Region")
+            form_data['country'] = st.text_input("Country")
         form_data['appellation'] = st.text_input("Appellation")
-        form_data['tasting_date'] = st.date_input("Tasting Date")
-        form_data['tasting_notes'] = st.text_area("Tasting Notes")
-        form_data['aromas'] = st.text_input("Aromas (comma separated)")
-        form_data['flavors'] = st.text_input("Flavors (comma separated)")
-        form_data['body'] = st.selectbox("Body", ["Light", "Medium", "Full"])
-        form_data['tannin'] = st.selectbox("Tannin", ["Low", "Medium", "High"])
-        form_data['acidity'] = st.selectbox("Acidity", ["Low", "Medium", "High"])
-        form_data['sweetness'] = st.selectbox("Sweetness", ["Dry", "Off-Dry", "Sweet"])
-        form_data['alcohol_content'] = st.number_input("Alcohol Content", min_value=0.0, max_value=20.0, step=0.1)
-        form_data['rating'] = st.number_input("Rating (1-5 or 1-10)", min_value=1, max_value=10, step=1)
-        form_data['pairing_suggestions'] = st.text_input("Pairing Suggestions (comma separated)")
-        form_data['price'] = st.number_input("Price")
-        form_data['purchase_location'] = st.text_input("Purchase Location")
-        form_data['notes_metadata'] = st.text_input("Notes Metadata")
-        form_data['related_urls'] = st.text_input("Related URLs (comma separated)")
+            form_data['tasting_date'] = st.date_input("Tasting Date")
+            form_data['tasting_notes'] = st.text_area("Tasting Notes")
+            form_data['aromas'] = st.text_input("Aromas (comma separated)")
+            form_data['flavors'] = st.text_input("Flavors (comma separated)")
+            form_data['body'] = st.selectbox("Body", ["Light", "Medium", "Full"])
+            form_data['tannin'] = st.selectbox("Tannin", ["Low", "Medium", "High"])
+            form_data['acidity'] = st.selectbox("Acidity", ["Low", "Medium", "High"])
+            form_data['sweetness'] = st.selectbox("Sweetness", ["Dry", "Off-Dry", "Sweet"])
+            form_data['alcohol_content'] = st.number_input("Alcohol Content", min_value=0.0, max_value=20.0, step=0.1)
+            form_data['rating'] = st.number_input("Rating (1-5 or 1-10)", min_value=1, max_value=10, step=1)
+            form_data['pairing_suggestions'] = st.text_input("Pairing Suggestions (comma separated)")
+            form_data['price'] = st.number_input("Price")
+            form_data['purchase_location'] = st.text_input("Purchase Location")
+            form_data['notes_metadata'] = st.text_input("Notes Metadata")
+            form_data['related_urls'] = st.text_input("Related URLs (comma separated)")
         submitted = st.form_submit_button("Add Wine Entry")
         if submitted:
           # Convert the comma separated strings into proper lists
@@ -325,8 +325,8 @@ if __name__ == '__main__':
 
 
   # Main area for displaying wine data
-  st.header("Wine Journal Entries")
-  with st.spinner("Loading wine entries..."):
+    st.header("Wine Journal Entries")
+    with st.spinner("Loading wine entries..."):
     wines = get_all_wines(engine)
 
     if wines:
