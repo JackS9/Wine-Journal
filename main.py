@@ -235,12 +235,12 @@ if __name__ == '__main__':
                 'OPENAI_API_KEY': os.environ.get('OPENAI_API_KEY', '')
             }, f)
 
-  st.title("Wine Journaling App")
+    st.title("Wine Journaling App")
 
-  db_url = st.secrets["DATABASE_URL"]
-  engine = create_database(db_url)
-  tools = [add_wine_journal_entry]
-  tool_executor = ToolExecutor(tools)
+    db_url = st.secrets["DATABASE_URL"]
+    engine = create_database(db_url)
+    tools = [add_wine_journal_entry]
+    tool_executor = ToolExecutor(tools)
 
   prompt = ChatPromptTemplate.from_messages([
       SystemMessage(content="You are a helpful agent, that will follow user instructions"),
