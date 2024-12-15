@@ -243,22 +243,22 @@ if __name__ == '__main__':
     tool_executor = ToolExecutor(tools)
 
   prompt = ChatPromptTemplate.from_messages([
-      SystemMessage(content="You are a helpful agent, that will follow user instructions"),
-      MessagesPlaceholder(variable_name="chat_history"),
-      MessagesPlaceholder(variable_name="agent_scratchpad"),
-      ("user", "{input}")
-  ])
+        SystemMessage(content="You are a helpful agent, that will follow user instructions"),
+        MessagesPlaceholder(variable_name="chat_history"),
+        MessagesPlaceholder(variable_name="agent_scratchpad"),
+        ("user", "{input}")
+    ])
 
-  def format_tool_input(messages):
-      return format_to_openai_tool_messages(messages)
+    def format_tool_input(messages):
+        return format_to_openai_tool_messages(messages)
 
-  def parse_output(output):
-      return output.content
+    def parse_output(output):
+        return output.content
 
-  agent = Runnable(prompt) | tool_executor | StrOutputParser()
+    agent = Runnable(prompt) | tool_executor | StrOutputParser()
 
-  # Define chat history so the agent can keep track of previous prompts and actions
-  chat_history = []
+    # Define chat history so the agent can keep track of previous prompts and actions
+    chat_history = []
 
   # Sidebar for adding wine entry
   with st.sidebar:
