@@ -1,5 +1,5 @@
 
-entrypoint = "streamlit run main.py"
+entrypoint = "python -m streamlit run main.py"
 modules = ["python-3.11", "postgresql-16"]
 
 [nix]
@@ -12,5 +12,5 @@ language = "python3"
 requiredFiles = [".replit", "replit.nix"]
 
 [deployment]
-run = ["streamlit", "run", "main.py", "--server.address=0.0.0.0"]
+run = ["python", "-m", "streamlit", "run", "main.py", "--server.address=0.0.0.0"]
 deploymentTarget = "cloudrun"
