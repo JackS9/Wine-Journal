@@ -222,14 +222,18 @@ def get_all_wines(engine):
 
 
 if __name__ == '__main__':
-  # Initialize Streamlit secrets from Replit secrets
-  if 'DATABASE_URL' not in st.secrets:
-      st.error("DATABASE_URL not found in secrets. Please add it in the Secrets tool.")
-      st.stop()
-  
-  if 'OPENAI_API_KEY' not in st.secrets:
-      st.error("OPENAI_API_KEY not found in secrets. Please add it in the Secrets tool.")
-      st.stop()
+    # Initialize Streamlit secrets from environment variables
+    import toml
+    import os
+    
+    secrets_path = os.path.join('.streamlit', 'secrets.toml')
+    if not os.path.exists(secrets_path):
+        os.makedirs('.streamlit', exist_ok=True)
+        with open(secrets_path, 'w') as f:
+            toml.dump({
+                'DATABASE_URL': os.environ.get('DATABASE_URL', ''),
+                'OPENAI_API_KEY': os.environ.get('OPENAI_API_KEY', '')
+            }, f)
 
   st.title("Wine Journaling App")
 
