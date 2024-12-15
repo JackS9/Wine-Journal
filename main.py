@@ -222,6 +222,11 @@ def get_all_wines(engine):
 
 
 if __name__ == '__main__':
+  # Initialize Streamlit secrets from Replit secrets
+  for key in ["DATABASE_URL", "OPENAI_API_KEY"]:
+      if key in os.environ:
+          st.secrets[key] = os.environ[key]
+
   st.title("Wine Journaling App")
 
   db_url = st.secrets["DATABASE_URL"]
