@@ -167,7 +167,7 @@ def add_wine_journal_entry(wine_data: dict) -> dict:
     Returns:
         A dict with the success status of the operation and other metadata
   """
-  db_url = st.secrets["POSTGRES_URL"]
+  db_url = st.secrets["DATABASE_URL"]
   engine = create_database(db_url)
 
   try:
@@ -224,7 +224,7 @@ def get_all_wines(engine):
 if __name__ == '__main__':
   st.title("Wine Journaling App")
 
-  db_url = st.secrets["POSTGRES_URL"]
+  db_url = st.secrets["DATABASE_URL"]
   engine = create_database(db_url)
   tools = [add_wine_journal_entry]
   tool_executor = ToolExecutor(tools)
