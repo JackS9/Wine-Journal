@@ -268,16 +268,15 @@ if __name__ == '__main__':
         form_data = {}
 
         if uploaded_file:
-          image = Image.open(uploaded_file)
-          st.image(image, caption="Uploaded Wine Label", width=200)
-          # Convert image to base64
-          buffered = BytesIO()
-          image.save(buffered, format="JPEG")
-          encoded_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
-          form_data['label_image'] = encoded_string
+            image = Image.open(uploaded_file)
+            st.image(image, caption="Uploaded Wine Label", width=200)
+            # Convert image to base64
+            buffered = BytesIO()
+            image.save(buffered, format="JPEG")
+            encoded_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
+            form_data['label_image'] = encoded_string
 
-
-      with st.form("add_wine_form"):
+        with st.form("add_wine_form"):
             form_data['name'] = st.text_input("Wine Name")
             form_data['producer'] = st.text_input("Producer")
             form_data['vintage'] = st.number_input("Vintage", min_value=1000, max_value=2100, step=1, value=2023)
