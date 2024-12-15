@@ -1,14 +1,12 @@
-from typing import Annotated, List, Dict, Any, Optional
+from typing import List, Dict, Optional
 from datetime import date
 from pydantic import BaseModel, Field
 
 from langchain.tools import tool
 from langgraph.prebuilt import ToolExecutor
-from langchain_core.callbacks.base import BaseCallbackManager
-from langchain.tools import Tool
 from langchain.agents.format_scratchpad.openai_tools import format_to_openai_tool_messages
-from langchain_core.runnables.base import Runnable, RunnableConfig
-from langchain_core.messages import BaseMessage, SystemMessage
+from langchain_core.runnables.base import Runnable
+from langchain_core.messages import SystemMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
@@ -255,7 +253,7 @@ if __name__ == '__main__':
     def parse_output(output):
         return output.content
 
-    agent = Runnable(prompt) | tool_executor | StrOutputParser()
+    agent = prompt | tool_executor | StrOutputParser()
 
     # Define chat history so the agent can keep track of previous prompts and actions
     chat_history = []
@@ -354,13 +352,13 @@ if __name__ == '__main__':
                 st.write(f"**Notes Metadata:** {wine['notes_metadata']}")
                 st.write(f"**Related URLs:** {', '.join(wine['related_urls']) if wine['related_urls'] else 'N/A'}")
 
-          if wine['label_image']:
-                    try:
-                        image = Image.open(BytesIO(base64.b64decode(wine['label_image'])))
-                        st.image(image, caption="Wine Label", width=200)
-                    except Exception as e:
-                        st.write(f"Error decoding the image for: {wine['name']}")
-                        st.write(f"Error: {e}")
+        if wine['label_image']:
+            try:
+                image = Image.open(BytesIO(base64.b64decode(wine['label_image'])))
+                st.image(image, caption="Wine Label", width=200)
+            except Exception as e:
+                st.write(f"Error decoding the image for: {wine['name']}")
+                st.write(f"Error: {e}")
                 st.markdown("---")
         else:
             st.write("No wine entries found in the database.")
