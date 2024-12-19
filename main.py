@@ -1,28 +1,46 @@
-from typing import List, Dict, Optional
+from typing import Annotated, List, Dict, Any, Optional, Tuple
+from typing_extensions import TypedDict
 from datetime import date
 from pydantic import BaseModel, Field
+import json
 
 from langchain.tools import tool
-from langgraph.prebuilt import ToolExecutor
+from langchain_core.callbacks.base import BaseCallbackManager
+from langchain.tools import Tool
 from langchain.agents.format_scratchpad.openai_tools import format_to_openai_tool_messages
-from langchain_core.runnables.base import Runnable
-from langchain_core.messages import SystemMessage
+from langchain_core.runnables.base import Runnable, RunnableConfig
+from langchain_core.messages import BaseMessage, SystemMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import JsonOutputParser
+from langchain.agents import AgentExecutor
+from langchain_core.runnables import RunnablePassthrough
+from langchain.agents.format_scratchpad import format_to_openai_function_messages
+from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
+from langchain.schema import SystemMessage, HumanMessage
+from langgraph.graph import StateGraph
+import base64
+from langgraph.prebuilt import ToolInvocation
+from langgraph.graph import END
 
 from sqlalchemy import create_engine, Column, Integer, String, Date, Float, PickleType, LargeBinary, ARRAY
 from sqlalchemy.orm import declarative_base, Session
 from sqlalchemy.exc import IntegrityError
-import base64
 import os
+from dotenv import load_dotenv
 import streamlit as st
 from io import BytesIO
 from PIL import Image
+import requests
+from bs4 import BeautifulSoup
+from tavily import TavilyClient
+from langsmith import traceable
+from langchain_core.tracers import LangChainTracer
+
+load_dotenv()
 
 Base = declarative_base()
-
 
 class Wine(BaseModel):
     """
@@ -49,9 +67,17 @@ class Wine(BaseModel):
     pairing_suggestions: Optional[List[str]] = Field(default=None, description="Suggested food pairings (e.g., ['Steak', 'Lamb', 'Hard Cheese']).")
     price: Optional[float] = Field(default=None, description="The price of the bottle.")
     purchase_location: Optional[str] = Field(default=None, description="Where the wine was purchased (e.g., 'Local Wine Shop', 'Restaurant').")
-    notes_metadata: Optional[Dict] = Field(default=None, description="Optional metadata to store with the wine notes")
+    notes_metadata: Optional[dict] = Field(default=None, description="Optional metadata to store with the wine notes")
     label_image: Optional[str] = Field(default=None, description="Base64 encoded string of the wine label image.")
     related_urls: Optional[List[str]] = Field(default=None, description="List of URLs related to the wine")
+
+class AgentState(TypedDict):
+   """
+   Represents the state of our agent
+   """
+   wine_data: Dict[str, Any] = Field(default={})
+   messages: List[BaseMessage] = Field(default=[])
+   next_step: Optional[str] = Field(default=None)
 
 
 class WineTable(Base):
@@ -95,7 +121,7 @@ def create_database(db_url: str):
     return engine
 
 
-def add_wine_to_db(wine: Wine, engine):
+def add_wine_to_db(wine: Wine, engine) -> dict:
     """Adds wine data to the PostgreSQL database."""
     session = Session(engine)
     try:
@@ -111,7 +137,7 @@ def add_wine_to_db(wine: Wine, engine):
     finally:
         session.close()
 
-
+@traceable
 def analyze_wine_label(image_base64: str) -> dict:
     """
     Analyzes a wine label image using an LLM to extract information and populate
@@ -123,7 +149,7 @@ def analyze_wine_label(image_base64: str) -> dict:
     Returns:
         A dictionary containing the populated wine information if successful, or an empty dictionary if the analysis failed.
     """
-    llm = ChatOpenAI(model="gpt-4-vision-preview", max_tokens=1024)
+    llm = ChatOpenAI(model="gpt-4o-mini", max_tokens=4096)
 
     prompt = ChatPromptTemplate.from_messages([
         SystemMessage(
@@ -146,9 +172,7 @@ def analyze_wine_label(image_base64: str) -> dict:
     ])
 
     parser = JsonOutputParser()
-
     chain = prompt | llm | parser
-
     try:
         result = chain.invoke({"image_data": image_base64})
         return result
@@ -156,8 +180,144 @@ def analyze_wine_label(image_base64: str) -> dict:
         print(f"Error analyzing wine label: {e}")
         return {}
 
-@tool
-def add_wine_journal_entry(wine_data: dict) -> dict:
+@traceable
+def search_web(query: str) -> List[str]:
+    """
+        Searches the web using Tavily API and returns a list of URLs.
+
+        Args:
+            query (str): The search query.
+
+        Returns:
+            A list of relevant URLs
+    """
+    tavily_api_key = os.getenv("TAVILY_API_KEY")
+    if not tavily_api_key:
+        print("Tavily API Key not set")
+        return []
+    client = TavilyClient(api_key=tavily_api_key)
+
+    try:
+        results = client.search(query=query, search_depth="basic")
+        if (results):
+            urls = []
+            for result in results:
+                urls.append(result.url)
+            return urls
+        else:
+            return []
+    except Exception as e:
+        print(f"Error searching the web with Tavily: {e}")
+        return []
+
+@traceable
+def scrape_wine_data(url: str) -> dict:
+    """
+        Scrapes detailed wine information from a given URL using BeautifulSoup.
+
+        Args:
+            url (str): The URL of the webpage to scrape.
+
+        Returns:
+            A dictionary of scraped wine information or an empty dictionary if fails
+    """
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Customize the logic to extract relevant information based on the website structure
+        # Here's an example to get text inside a specific div id:
+
+        wine_info = {}
+        # Example of extracting all text inside a div with ID 'wine-details'
+        details_div = soup.find('div', id='wine-details')
+        if details_div:
+           wine_info['detailed_notes'] = details_div.get_text(strip=True)
+           return wine_info
+
+        # If it doesn't find a div with id 'wine-details' then return an empty dict.
+        return {}
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error scraping URL {url}: {e}")
+        return {}
+    except Exception as e:
+        print(f"Error during scraping: {e}")
+        return {}
+
+
+
+def image_analysis_tool(agent_state: AgentState) -> AgentState:
+    """
+        Analyzes the wine label image using an LLM
+    """
+    wine_data = agent_state['wine_data']
+    try:
+        wine = Wine(**wine_data)
+        if wine.label_image:
+            analysis_result = analyze_wine_label(wine.label_image)
+            # Update the attributes from the LLM analysis, but keep the original value of the field if the attribute is not available.
+            wine = Wine(**{**wine.model_dump(exclude={"label_image"}), **analysis_result})
+            agent_state['wine_data'] = wine
+            agent_state['messages'].append(HumanMessage(content=f"Wine label analysis result: {analysis_result}"))
+            return agent_state
+        else:
+            agent_state['wine_data'] = wine_data
+            return agent_state
+    except Exception as e:
+        agent_state['messages'].append(HumanMessage(content=f"Error analyzing wine label: {e}"))
+        return agent_state
+
+
+def web_search_tool(agent_state: AgentState) -> AgentState:
+    """
+    Searches the web using Tavily API to search for wine related information
+    """
+    wine_data = agent_state['wine_data']
+    try:
+        wine = Wine(**wine_data)
+        search_query = f"{wine.name} {wine.producer} {wine.vintage}" if wine.name and wine.producer and wine.vintage else wine.name
+        if search_query:
+            search_results = search_web(query=search_query)
+            wine = Wine(**{**wine.model_dump(), "related_urls": search_results})
+            agent_state['wine_data'] = wine.model_dump()
+            return agent_state
+        else:
+          agent_state['wine_data'] = wine_data
+          return agent_state
+    except Exception as e:
+        agent_state['messages'].append(HumanMessage(content=f"Error searching the web: {e}"))
+        return agent_state
+
+
+
+def web_scrape_tool(agent_state: AgentState) -> AgentState:
+    """
+    Scrapes detailed wine information from a given list of URLs using BeautifulSoup.
+    """
+    wine_data = agent_state['wine_data']
+    try:
+        wine = Wine(**wine_data)
+        scraped_data_all = {}
+        if wine.related_urls:
+            for url in wine.related_urls:
+                scraped_data = scrape_wine_data(url=url)
+                #Adding all the fields from the scraped data, this might include duplicate fields that can be overwritten by later steps
+                scraped_data_all.update(scraped_data)
+            wine = Wine(**{**wine.model_dump(), **scraped_data_all})
+            agent_state['wine_data'] = wine.model_dump()
+            return agent_state
+        else:
+            agent_state['wine_data'] = wine_data
+            return agent_state
+    except Exception as e:
+        agent_state['messages'].append(HumanMessage(content=f"Error scraping the web: {e}"))
+        return agent_state
+
+
+def add_wine_journal_entry(agent_state: AgentState) -> AgentState:
   """
     Adds an entry of the wine journal to the database
     Args:
@@ -165,24 +325,20 @@ def add_wine_journal_entry(wine_data: dict) -> dict:
     Returns:
         A dict with the success status of the operation and other metadata
   """
-  db_url = st.secrets["DATABASE_URL"]
+  wine_data = agent_state['wine_data']
+  db_url = os.getenv("DATABASE_URL")
   engine = create_database(db_url)
-
   try:
     wine = Wine(**wine_data)
-    if wine.label_image:
-        analysis_result = analyze_wine_label(wine.label_image)
-        # Update the attributes from the LLM analysis, but keep the original value of the field if the attribute is not available.
-        wine = Wine(
-            **{**wine.model_dump(exclude={"label_image"}), **analysis_result}
-        )
     result = add_wine_to_db(wine, engine)
-    return result
+    agent_state['messages'].append(HumanMessage(content=f"Wine entry added. Result: {result}"))
+    return agent_state
   except Exception as e:
-      return {"success": False, "error": str(e)}
+      agent_state['messages'].append(HumanMessage(content=f"Error adding wine entry: {e}"))
+      return agent_state
 
 
-def get_all_wines(engine):
+def get_all_wines(engine) -> List[dict]:
     """Retrieves all wine entries from the database."""
     session = Session(engine)
     try:
@@ -218,147 +374,116 @@ def get_all_wines(engine):
     finally:
         session.close()
 
-
 if __name__ == '__main__':
-    # Initialize Streamlit secrets from environment variables
-    import toml
-    import os
-    
-    secrets_path = os.path.join('.streamlit', 'secrets.toml')
-    if not os.path.exists(secrets_path):
-        os.makedirs('.streamlit', exist_ok=True)
-        with open(secrets_path, 'w') as f:
-            toml.dump({
-                'DATABASE_URL': os.environ.get('DATABASE_URL', ''),
-                'OPENAI_API_KEY': os.environ.get('OPENAI_API_KEY', '')
-            }, f)
+  st.title("Wine Journaling App")
 
-    st.title("Wine Journaling App")
+  db_url = os.getenv("DATABASE_URL")
+  engine = create_database(db_url)
 
-    db_url = st.secrets["DATABASE_URL"]
-    engine = create_database(db_url)
-    tools = [add_wine_journal_entry]
-    tool_executor = ToolExecutor(tools)
+  # Define the tools
+  tools_image_analysis = [image_analysis_tool]
+  tools_web_search = [web_search_tool]
+  tools_web_scrape = [web_scrape_tool]
+  tools_add_db = [add_wine_journal_entry]
 
-    prompt = ChatPromptTemplate.from_messages([
-        SystemMessage(content="You are a helpful agent, that will follow user instructions"),
-        MessagesPlaceholder(variable_name="chat_history"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
-        ("user", "{input}")
-    ])
+  # Define the Langraph Graph
+  workflow = StateGraph(AgentState)
+  workflow.add_node("image_analysis_node", image_analysis_tool)
+  workflow.add_node("web_search_node", web_search_tool)
+  workflow.add_node("web_scrape_node", web_scrape_tool)
+  workflow.add_node("add_to_database", add_wine_journal_entry)
+  workflow.set_entry_point("image_analysis_node")
 
-    def format_tool_input(messages):
-        return format_to_openai_tool_messages(messages)
+  workflow.add_edge("image_analysis_node", "web_search_node")
+  workflow.add_edge("web_search_node", "web_scrape_node")
+  workflow.add_edge("web_scrape_node", "add_to_database")
+  app = workflow.compile()
 
-    def parse_output(output):
-        return output.content
+  # Sidebar for adding wine entry
+  with st.sidebar:
+      st.header("Add New Wine Entry")
+      uploaded_file = st.file_uploader("Upload Wine Label Image", type=["jpg", "jpeg", "png"])
+      form_data: Dict[str, Any] = {}
 
-    agent = prompt | tool_executor | StrOutputParser()
+      if uploaded_file:
+          image = Image.open(uploaded_file)
+          st.image(image, caption="Uploaded Wine Label", width=200)
+          # Convert image to base64
+          buffered = BytesIO()
+          image.save(buffered, format="JPEG")
+          encoded_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
+          form_data['label_image'] = encoded_string
 
-    # Define chat history so the agent can keep track of previous prompts and actions
-    chat_history = []
+      with st.form("add_wine_form"):
+        form_data['name'] = st.text_input("Wine Name")
+        form_data['producer'] = st.text_input("Producer")
+        form_data['vintage'] = st.number_input("Vintage", min_value=1000, max_value=2100, step=1, value=2023)
+        form_data['wine_type'] = st.text_input("Wine Type (Red, White, Rose, etc)")
+        form_data['grape_varieties'] = st.text_input("Grape Varieties (comma separated)").split(',')
+        form_data['region'] = st.text_input("Region")
+        form_data['country'] = st.text_input("Country")
+        form_data['appellation'] = st.text_input("Appellation")
+        form_data['tasting_date'] = st.date_input("Tasting Date")
+        form_data['tasting_notes'] = st.text_area("Tasting Notes")
+        form_data['aromas'] = st.text_input("Aromas (comma separated)").split(',')
+        form_data['flavors'] = st.text_input("Flavors (comma separated)").split(',')
+        form_data['body'] = st.selectbox("Body", ["Light", "Medium", "Full"])
+        form_data['tannin'] = st.selectbox("Tannin", ["Low", "Medium", "High"])
+        form_data['acidity'] = st.selectbox("Acidity", ["Low", "Medium", "High"])
+        form_data['sweetness'] = st.selectbox("Sweetness", ["Dry", "Off-Dry", "Sweet"])
+        form_data['alcohol_content'] = st.number_input("Alcohol Content", min_value=0.0, max_value=20.0, step=0.1)
+        form_data['rating'] = st.number_input("Rating (1-5 or 1-10)", min_value=1, max_value=10, step=1)
+        form_data['pairing_suggestions'] = st.text_input("Pairing Suggestions (comma separated)").split(',')
+        form_data['price'] = st.number_input("Price")
+        form_data['purchase_location'] = st.text_input("Purchase Location")
+        form_data['notes_metadata'] = json.loads(st.text_input("Notes Metadata") or '{}')
+        form_data['related_urls'] = st.text_input("Related URLs (comma separated)").split(',')
+        submitted = st.form_submit_button("Add Wine Entry")
 
-    # Sidebar for adding wine entry
-    with st.sidebar:
-        st.header("Add New Wine Entry")
-        uploaded_file = st.file_uploader("Upload Wine Label Image", type=["jpg", "jpeg", "png"])
-        #Initialize empty form data to hold the values of the fields
-        form_data = {}
-
-        if uploaded_file:
-            image = Image.open(uploaded_file)
-            st.image(image, caption="Uploaded Wine Label", width=200)
-            # Convert image to base64
-            buffered = BytesIO()
-            image.save(buffered, format="JPEG")
-            encoded_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
-            form_data['label_image'] = encoded_string
-
-        with st.form("add_wine_form"):
-            form_data['name'] = st.text_input("Wine Name")
-            form_data['producer'] = st.text_input("Producer")
-            form_data['vintage'] = st.number_input("Vintage", min_value=1000, max_value=2100, step=1, value=2023)
-            form_data['wine_type'] = st.text_input("Wine Type (Red, White, Rose, etc)")
-            form_data['grape_varieties'] = st.text_input("Grape Varieties (comma separated)")
-            form_data['region'] = st.text_input("Region")
-            form_data['country'] = st.text_input("Country")
-            form_data['appellation'] = st.text_input("Appellation")
-            form_data['tasting_date'] = st.date_input("Tasting Date")
-            form_data['tasting_notes'] = st.text_area("Tasting Notes")
-            form_data['aromas'] = st.text_input("Aromas (comma separated)")
-            form_data['flavors'] = st.text_input("Flavors (comma separated)")
-            form_data['body'] = st.selectbox("Body", ["Light", "Medium", "Full"])
-            form_data['tannin'] = st.selectbox("Tannin", ["Low", "Medium", "High"])
-            form_data['acidity'] = st.selectbox("Acidity", ["Low", "Medium", "High"])
-            form_data['sweetness'] = st.selectbox("Sweetness", ["Dry", "Off-Dry", "Sweet"])
-            form_data['alcohol_content'] = st.number_input("Alcohol Content", min_value=0.0, max_value=20.0, step=0.1)
-            form_data['rating'] = st.number_input("Rating (1-5 or 1-10)", min_value=1, max_value=10, step=1)
-            form_data['pairing_suggestions'] = st.text_input("Pairing Suggestions (comma separated)")
-            form_data['price'] = st.number_input("Price")
-            form_data['purchase_location'] = st.text_input("Purchase Location")
-            form_data['notes_metadata'] = st.text_input("Notes Metadata")
-            form_data['related_urls'] = st.text_input("Related URLs (comma separated)")
-            submitted = st.form_submit_button("Add Wine Entry")
         if submitted:
-          # Convert the comma separated strings into proper lists
-          if form_data['grape_varieties']:
-             form_data['grape_varieties'] = form_data['grape_varieties'].split(",")
-          if form_data['aromas']:
-             form_data['aromas'] = form_data['aromas'].split(",")
-          if form_data['flavors']:
-             form_data['flavors'] = form_data['flavors'].split(",")
-          if form_data['pairing_suggestions']:
-              form_data['pairing_suggestions'] = form_data['pairing_suggestions'].split(",")
-          if form_data['related_urls']:
-              form_data['related_urls'] = form_data['related_urls'].split(",")
-
-          with st.spinner("Adding wine entry..."):
-              result = agent.invoke({
-                "input": "Add a new journal entry to the database with the following values: " + str(form_data),
-                "chat_history": chat_history,
-                "agent_scratchpad": []
-             })
-              st.success(f"Wine entry added. Result: {result}")
-
+            with st.spinner("Adding wine entry..."):
+                # We are initializing the Agent state
+                agent_state = AgentState(wine_data=form_data, messages=[])
+                result = app.invoke(agent_state)
+                st.success(f"Wine entry added for: {form_data['name']}")
 
   # Main area for displaying wine data
-    st.header("Wine Journal Entries")
-    with st.spinner("Loading wine entries..."):
-        wines = get_all_wines(engine)
+  st.header("Wine Journal Entries")
+  with st.spinner("Loading wine entries..."):
+    wines = get_all_wines(engine)
+    if wines:
+        for wine in wines:
+          st.subheader(wine['name'])
+          st.write(f"**Producer:** {wine['producer']}")
+          st.write(f"**Vintage:** {wine['vintage']}")
+          st.write(f"**Wine Type:** {wine['wine_type']}")
+          st.write(f"**Grape Varieties:** {', '.join(wine['grape_varieties']) if wine['grape_varieties'] else 'N/A'}")
+          st.write(f"**Region:** {wine['region']}")
+          st.write(f"**Country:** {wine['country']}")
+          st.write(f"**Appellation:** {wine['appellation']}")
+          st.write(f"**Tasting Date:** {wine['tasting_date']}")
+          st.write(f"**Tasting Notes:** {wine['tasting_notes']}")
+          st.write(f"**Aromas:** {', '.join(wine['aromas']) if wine['aromas'] else 'N/A'}")
+          st.write(f"**Flavors:** {', '.join(wine['flavors']) if wine['flavors'] else 'N/A'}")
+          st.write(f"**Body:** {wine['body']}")
+          st.write(f"**Tannin:** {wine['tannin']}")
+          st.write(f"**Acidity:** {wine['acidity']}")
+          st.write(f"**Sweetness:** {wine['sweetness']}")
+          st.write(f"**Alcohol Content:** {wine['alcohol_content']}")
+          st.write(f"**Rating:** {wine['rating']}")
+          st.write(f"**Pairing Suggestions:** {', '.join(wine['pairing_suggestions']) if wine['pairing_suggestions'] else 'N/A'}")
+          st.write(f"**Price:** {wine['price']}")
+          st.write(f"**Purchase Location:** {wine['purchase_location']}")
+          st.write(f"**Notes Metadata:** {wine['notes_metadata']}")
+          st.write(f"**Related URLs:** {', '.join(wine['related_urls']) if wine['related_urls'] else 'N/A'}")
 
-        if wines:
-            for wine in wines:
-                st.subheader(wine['name'])
-                st.write(f"**Producer:** {wine['producer']}")
-                st.write(f"**Vintage:** {wine['vintage']}")
-                st.write(f"**Wine Type:** {wine['wine_type']}")
-                st.write(f"**Grape Varieties:** {', '.join(wine['grape_varieties']) if wine['grape_varieties'] else 'N/A'}")
-                st.write(f"**Region:** {wine['region']}")
-                st.write(f"**Country:** {wine['country']}")
-                st.write(f"**Appellation:** {wine['appellation']}")
-                st.write(f"**Tasting Date:** {wine['tasting_date']}")
-                st.write(f"**Tasting Notes:** {wine['tasting_notes']}")
-                st.write(f"**Aromas:** {', '.join(wine['aromas']) if wine['aromas'] else 'N/A'}")
-                st.write(f"**Flavors:** {', '.join(wine['flavors']) if wine['flavors'] else 'N/A'}")
-                st.write(f"**Body:** {wine['body']}")
-                st.write(f"**Tannin:** {wine['tannin']}")
-                st.write(f"**Acidity:** {wine['acidity']}")
-                st.write(f"**Sweetness:** {wine['sweetness']}")
-                st.write(f"**Alcohol Content:** {wine['alcohol_content']}")
-                st.write(f"**Rating:** {wine['rating']}")
-                st.write(f"**Pairing Suggestions:** {', '.join(wine['pairing_suggestions']) if wine['pairing_suggestions'] else 'N/A'}")
-                st.write(f"**Price:** {wine['price']}")
-                st.write(f"**Purchase Location:** {wine['purchase_location']}")
-                st.write(f"**Notes Metadata:** {wine['notes_metadata']}")
-                st.write(f"**Related URLs:** {', '.join(wine['related_urls']) if wine['related_urls'] else 'N/A'}")
-
-        if wine['label_image']:
+          if wine['label_image']:
             try:
                 image = Image.open(BytesIO(base64.b64decode(wine['label_image'])))
                 st.image(image, caption="Wine Label", width=200)
             except Exception as e:
                 st.write(f"Error decoding the image for: {wine['name']}")
                 st.write(f"Error: {e}")
-                st.markdown("---")
-        else:
-            st.write("No wine entries found in the database.")
+          st.markdown("---")
+    else:
+       st.write("No wine entries found in the database.")

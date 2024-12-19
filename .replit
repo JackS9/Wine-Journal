@@ -1,5 +1,5 @@
 
-entrypoint = "/usr/bin/python3 -m streamlit run main.py"
+entrypoint = "python -m streamlit run main.py"
 modules = ["python-3.11", "postgresql-16"]
 
 [nix]
@@ -12,5 +12,17 @@ language = "python3"
 requiredFiles = [".replit", "replit.nix"]
 
 [deployment]
-run = ["/usr/bin/python3", "-m", "streamlit", "run", "main.py", "--server.address=0.0.0.0"]
+run = ["python", "-m", "streamlit", "run", "main.py", "--server.address=0.0.0.0"]
 deploymentTarget = "cloudrun"
+
+[[ports]]
+localPort = 8501
+externalPort = 80
+
+[[ports]]
+localPort = 8502
+externalPort = 3000
+
+[[ports]]
+localPort = 8503
+externalPort = 3001
