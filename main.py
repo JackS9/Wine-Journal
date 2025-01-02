@@ -1,6 +1,6 @@
 from typing import Annotated, List, Dict, Any, Optional, Tuple
 from typing_extensions import TypedDict
-from datetime import date
+from datetime import date, datetime, timedelta
 from pydantic import BaseModel, Field
 import json
 
@@ -24,7 +24,7 @@ import base64
 from langgraph.prebuilt import ToolInvocation
 from langgraph.graph import END
 
-from sqlalchemy import create_engine, Column, Integer, String, Date, Float, PickleType, LargeBinary, ARRAY
+from sqlalchemy import create_engine, desc, Column, Integer, String, Date, Float, PickleType, LargeBinary, ARRAY
 from sqlalchemy.orm import declarative_base, Session
 from sqlalchemy.exc import IntegrityError
 import os
@@ -35,6 +35,8 @@ from PIL import Image
 import requests
 from bs4 import BeautifulSoup
 from tavily import TavilyClient
+import re
+from pprint import pprint
 from langsmith import traceable
 from langchain_core.tracers import LangChainTracer
 
@@ -137,6 +139,34 @@ def add_wine_to_db(wine: Wine, engine) -> dict:
     finally:
         session.close()
 
+def iterate_nested_json(json_obj, max_depth: int = 0):
+    global prefix
+    old_prefix = prefix
+    depth = prefix.count("[")
+    if max_depth > 0 and depth > depth:
+        return
+    if isinstance(json_obj, dict):
+        for key, value in json_obj.items():
+            if isinstance(value, dict) or isinstance(value, list):
+                prefix = prefix + f"[{key}]"
+                iterate_nested_json(value)
+                prefix = old_prefix
+            else:
+                if prefix.startswith("[vintage]"):
+                    print(f"{prefix}[{key}]: {value}")
+    elif isinstance(json_obj, list):
+        for index, value in enumerate(json_obj):
+            if isinstance(value, dict) or isinstance(value, list):
+                prefix = prefix + f"[{index}]"
+                iterate_nested_json(value)
+                prefix = old_prefix
+            else:
+                if prefix.startswith("[vintage]"):
+                    print(f"{prefix}[{index}]{value}")
+    else:
+        if prefix.startswith("[vintage]"):
+           print(f"{prefix}{value}")
+
 @traceable
 def analyze_wine_label(image_base64: str) -> dict:
     """
@@ -149,7 +179,7 @@ def analyze_wine_label(image_base64: str) -> dict:
     Returns:
         A dictionary containing the populated wine information if successful, or an empty dictionary if the analysis failed.
     """
-    llm = ChatOpenAI(model="gpt-4o-mini", max_tokens=4096)
+    llm = ChatOpenAI(model="gpt-4o-mini", max_tokens=4096, api_key=os.getenv("OPENAI_API_KEY"))
 
     prompt = ChatPromptTemplate.from_messages([
         SystemMessage(
@@ -157,7 +187,7 @@ def analyze_wine_label(image_base64: str) -> dict:
                     "Analyze the image I provide and fill in the missing fields about this wine."
                     "Return the output as a JSON with the wine attributes, do not include any explanatory text"
         ),
-        ("user", "Here is the base64 encoded image data: {image_data} \n\n"
+        ("user", "Here is the base64 encoded image data: {image_base64} \n\n"
                  "Try to populate the following attributes of the wine, return only a JSON object, do not include any explanatory text:\n"
                  "- name\n"
                  "- producer\n"
@@ -168,7 +198,6 @@ def analyze_wine_label(image_base64: str) -> dict:
                  "- country\n"
                  "- appellation\n"
         )
-
     ])
 
     parser = JsonOutputParser()
@@ -198,11 +227,21 @@ def search_web(query: str) -> List[str]:
     client = TavilyClient(api_key=tavily_api_key)
 
     try:
-        results = client.search(query=query, search_depth="basic")
-        if (results):
+        response = client.search(query=query, include_domains=['vivino.com'], search_depth="basic")
+        if (response['results']):
             urls = []
-            for result in results:
-                urls.append(result.url)
+            for result in response['results']:
+                if result['score'] < 0.5:
+                    print("Score < 0.5, skip")
+                    continue
+                if "toplists" in result['url']:
+                    print("Looks like toplist, skip")
+                    continue
+                # if all(s not in result['url'] for s in ["vivino.com/US/","vivino.com/FR/"]):
+                #     print("Not in US or France, exclude")
+                #     continue
+                pprint(result)
+                urls.append(result['url'])
             return urls
         else:
             return []
@@ -221,32 +260,118 @@ def scrape_wine_data(url: str) -> dict:
         Returns:
             A dictionary of scraped wine information or an empty dictionary if fails
     """
+    # if "vivino.com/US/" not in url and "vivino.com/FR/" not in url:
+    #     print("Neither /US/ nor /FR/ found in url")
+    #     return {}
+
+    # Replace language with English
+    # url = re.sub(r"/US/.*/", "/US/en/", url)
+    # url = re.sub(r"/FR/.*/", "/FR/en/", url)
+
+    # Add Accept-Language to header to help Vivino choose translation if available
 
     try:
-        response = requests.get(url)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "Accept-Language": "en-US"
+        }
+        response = requests.get(url, headers=headers)
+        soup = BeautifulSoup(response.content, "html.parser")
 
-        # Customize the logic to extract relevant information based on the website structure
-        # Here's an example to get text inside a specific div id:
+        # Step 3: Find all <script> tags
+        script_tags = soup.find_all("script")
+        global prefix
+        prefix = ""
+        # Step 4: Search for a specific pattern in each script tag
+        target_pattern = r"PageInformation"  # Regex to find any occurrence of 'VariableEnding'
 
-        wine_info = {}
-        # Example of extracting all text inside a div with ID 'wine-details'
-        details_div = soup.find('div', id='wine-details')
-        if details_div:
-           wine_info['detailed_notes'] = details_div.get_text(strip=True)
-           return wine_info
+        wine_data = {}
+        parsed_data = {}
+        for script_tag in script_tags:
+            if script_tag.string:  # Ensure the script tag has content
+                match = re.search(target_pattern, script_tag.string)
+                if match:
+                    script_content = script_tag.string
+                    # Regex to extract JSON data assigned to 'targetVariable'
+                    pattern = r"(\w*PageInformation)\s*=\s*(\{.*?\});"
+                    match = re.search(pattern, script_content, re.DOTALL)
 
-        # If it doesn't find a div with id 'wine-details' then return an empty dict.
-        return {}
+                    if match:
+                        json_data = match.group(2)  # Extract the JSON string
+                        #pprint.pprint(json_data)
+                        parsed_data = json.loads(json_data)  # Convert to Python dictionary
+                        #iterate_nested_json(parsed_data)
+                        #print(parsed_data)
+                        break
+                    else:
+                        print("Target variable not found in the script.")
+                else:
+                    print("Target pattern not found in the script.")
+            else:
+                print("No string found in this script.")
+
+        if parsed_data and parsed_data['vintage']:
+            print(f"Found Vintage: {parsed_data['vintage']['name']} ... at {url}")
+            wine_data['name'] = parsed_data['vintage']['name']
+            wine_data['tasting_notes'] = ''
+            wine_data['tasting_notes'] += f"Vivino wine description: {parsed_data['vintage']['wine']['description']}"
+            # wine_data['vintage'] = parsed_data['vintage']['year']
+            wine_data['region'] = parsed_data['vintage']['wine']['region']['name']
+            wine_data['country'] = parsed_data['vintage']['wine']['region']['country']['name']
+            wine_data['producer'] = parsed_data['vintage']['wine']['winery']['name']
+            wine_data['wine_type'] = parsed_data['vintage']['wine']['style']['regional_name'] + parsed_data['vintage']['wine']['style']['varietal_name']
+            wine_data['tasting_notes'] += f"\nVivino style description: {parsed_data['vintage']['wine']['style']['description']}"
+            wine_data['body'] = parsed_data['vintage']['wine']['style']['body_description'] + ", " + str(parsed_data['vintage']['wine']['style']['baseline_structure']['intensity'])
+            wine_data['acidity'] = parsed_data['vintage']['wine']['style']['acidity_description'] + ", " + str(parsed_data['vintage']['wine']['style']['baseline_structure']['acidity'])
+            wine_data['sweetness'] = str(parsed_data['vintage']['wine']['style']['baseline_structure']['sweetness'])
+            wine_data['tannin'] = str(parsed_data['vintage']['wine']['style']['baseline_structure']['tannin'])
+            wine_data['alcohol_content'] = parsed_data['vintage']['wine']['alcohol']
+            wine_data['grape_varieties'] = []
+            for index, grape in enumerate(parsed_data['vintage']['wine']['style']['grapes']):
+                #print(f"Index: {index}, Grape: {grape['name']}")
+                wine_data['grape_varieties'].append(grape['name'])
+            for index, fact in enumerate(parsed_data['vintage']['wine']['style']['interesting_facts']):
+                wine_data['tasting_notes'] += f"\nVivino interesting fact: {fact}"
+            pprint(wine_data)
+            return wine_data
+        elif parsed_data and parsed_data['wine']:
+            print(f"Found wine: {parsed_data['wine']['name']} ... at {url}")
+            wine_data['name'] = parsed_data['wine']['name']
+            wine_data['tasting_notes'] = ''
+            wine_data['tasting_notes'] += f"Vivino wine description: {parsed_data['wine']['description']}"
+            wine_data['region'] = parsed_data['wine']['region']['name']
+            wine_data['country'] = parsed_data['wine']['region']['country']['name']
+            wine_data['producer'] = parsed_data['wine']['winery']['name']
+            wine_data['wine_type'] = parsed_data['wine']['style']['regional_name'] + parsed_data['wine']['style']['varietal_name']
+            wine_data['tasting_notes'] += f"\nVivino style description: {parsed_data['wine']['style']['description']}"
+            wine_data['body'] = parsed_data['wine']['style']['body_description'] + ", " + str(parsed_data['wine']['style']['baseline_structure']['intensity'])
+            wine_data['acidity'] = parsed_data['wine']['style']['acidity_description'] + ", " + str(parsed_data['wine']['style']['baseline_structure']['acidity'])
+            wine_data['sweetness'] = str(parsed_data['wine']['style']['baseline_structure']['sweetness'])
+            wine_data['tannin'] = str(parsed_data['wine']['style']['baseline_structure']['tannin'])
+            wine_data['alcohol_content'] = parsed_data['wine']['alcohol']
+            wine_data['grape_varieties'] = []
+            for index, grape in enumerate(parsed_data['wine']['style']['grapes']):
+                #print(f"Index: {index}, Grape: {grape['name']}")
+                wine_data['grape_varieties'].append(grape['name'])
+            for index, fact in enumerate(parsed_data['wine']['style']['interesting_facts']):
+                wine_data['tasting_notes'] += f"\nVivino interesting fact: {fact}"
+            pprint(wine_data)
+            return wine_data
+        elif parsed_data:
+            print(f"Found parsed data, but no vintage or wine entry found at {url}")
+            print("Found this instead:")
+            iterate_nested_json(parsed_data, 1)
+            return {}
+        else:
+            print(f"Found no parsed data at {url}")
+            return {}
 
     except requests.exceptions.RequestException as e:
-        print(f"Error scraping URL {url}: {e}")
+        print(f"Request error scraping URL {url}: {e}")
         return {}
     except Exception as e:
-        print(f"Error during scraping: {e}")
+        print(f"Unknown error scraping URL {url}: {e}")
         return {}
-
 
 
 def image_analysis_tool(agent_state: AgentState) -> AgentState:
@@ -278,7 +403,7 @@ def web_search_tool(agent_state: AgentState) -> AgentState:
     wine_data = agent_state['wine_data']
     try:
         wine = Wine(**wine_data)
-        search_query = f"{wine.name} {wine.producer} {wine.vintage}" if wine.name and wine.producer and wine.vintage else wine.name
+        search_query = f"{wine.name} {wine.vintage}"
         if search_query:
             search_results = search_web(query=search_query)
             wine = Wine(**{**wine.model_dump(), "related_urls": search_results})
@@ -291,8 +416,6 @@ def web_search_tool(agent_state: AgentState) -> AgentState:
         agent_state['messages'].append(HumanMessage(content=f"Error searching the web: {e}"))
         return agent_state
 
-
-
 def web_scrape_tool(agent_state: AgentState) -> AgentState:
     """
     Scrapes detailed wine information from a given list of URLs using BeautifulSoup.
@@ -304,13 +427,19 @@ def web_scrape_tool(agent_state: AgentState) -> AgentState:
         if wine.related_urls:
             for url in wine.related_urls:
                 scraped_data = scrape_wine_data(url=url)
-                #Adding all the fields from the scraped data, this might include duplicate fields that can be overwritten by later steps
-                scraped_data_all.update(scraped_data)
+                if scraped_data:
+                    #Adding all the fields from the scraped data, this might include duplicate fields that can be overwritten by later steps
+                    scraped_data_all.update(scraped_data)
+                    #break
+                    print(f"Accumulated (updated) wine data after scraping {url}")
+                    pprint(scraped_data_all)
             wine = Wine(**{**wine.model_dump(), **scraped_data_all})
+            print("Current state of wine data model: ")
+            pprint(wine.model_dump())
             agent_state['wine_data'] = wine.model_dump()
             return agent_state
         else:
-            agent_state['wine_data'] = wine_data
+            agent_state['messages'].append(HumanMessage(content=f"No URLs from web search to scrape"))
             return agent_state
     except Exception as e:
         agent_state['messages'].append(HumanMessage(content=f"Error scraping the web: {e}"))
@@ -332,42 +461,85 @@ def add_wine_journal_entry(agent_state: AgentState) -> AgentState:
     wine = Wine(**wine_data)
     result = add_wine_to_db(wine, engine)
     agent_state['messages'].append(HumanMessage(content=f"Wine entry added. Result: {result}"))
+    pprint(agent_state['messages'])
     return agent_state
   except Exception as e:
       agent_state['messages'].append(HumanMessage(content=f"Error adding wine entry: {e}"))
+      pprint(agent_state['messages'])
       return agent_state
-
 
 def get_all_wines(engine) -> List[dict]:
     """Retrieves all wine entries from the database."""
     session = Session(engine)
     try:
-      wines_db = session.query(WineTable).all()
-      wines = []
-      for wine in wines_db:
-          wine_dict = wine.__dict__
-          # Convert the binary data to base64 for display
-          if wine_dict['label_image']:
-              wine_dict['label_image'] = base64.b64encode(wine_dict['label_image']).decode('utf-8')
+        wines_db = session.query(WineTable).all()
+        wines = []
+        for wine in wines_db:
+            wine_dict = wine.__dict__
+            # Convert the binary data to base64 for display
+            if wine_dict['label_image']:
+                wine_dict['label_image'] = base64.b64encode(wine_dict['label_image']).decode('utf-8')
 
-          # Convert the lists to regular python lists for display
-          if wine_dict['aromas']:
-              wine_dict['aromas'] = list(wine_dict['aromas'])
+            # Convert the lists to regular python lists for display
+            if wine_dict['aromas']:
+                wine_dict['aromas'] = list(wine_dict['aromas'])
 
-          if wine_dict['flavors']:
-              wine_dict['flavors'] = list(wine_dict['flavors'])
+            if wine_dict['flavors']:
+                wine_dict['flavors'] = list(wine_dict['flavors'])
 
-          if wine_dict['grape_varieties']:
-              wine_dict['grape_varieties'] = list(wine_dict['grape_varieties'])
+            if wine_dict['grape_varieties']:
+                wine_dict['grape_varieties'] = list(wine_dict['grape_varieties'])
 
-          if wine_dict['pairing_suggestions']:
-              wine_dict['pairing_suggestions'] = list(wine_dict['pairing_suggestions'])
+            if wine_dict['pairing_suggestions']:
+                wine_dict['pairing_suggestions'] = list(wine_dict['pairing_suggestions'])
 
-          if wine_dict['related_urls']:
-            wine_dict['related_urls'] = list(wine_dict['related_urls'])
+            if wine_dict['related_urls']:
+                wine_dict['related_urls'] = list(wine_dict['related_urls'])
 
-          wines.append(wine_dict)
-      return wines
+            wines.append(wine_dict)
+        return wines
+    except Exception as e:
+        print(f"Error retrieving wine entries from database: {e}")
+        return []
+    finally:
+        session.close()
+
+def get_latest_wines(engine) -> List[dict]:
+    """Retrieves all wine entries from the database."""
+    session = Session(engine)
+    try:
+        query = (
+            session.query(WineTable)
+#            .order_by(desc(WineTable.tasting_date)).limit(25)
+            .order_by(desc(WineTable.id)).limit(5)
+        )
+        wines_db = query.all()
+
+        wines = []
+        for wine in wines_db:
+            wine_dict = wine.__dict__
+            # Convert the binary data to base64 for display
+            if wine_dict['label_image']:
+                wine_dict['label_image'] = base64.b64encode(wine_dict['label_image']).decode('utf-8')
+
+            # Convert the lists to regular python lists for display
+            if wine_dict['aromas']:
+                wine_dict['aromas'] = list(wine_dict['aromas'])
+
+            if wine_dict['flavors']:
+                wine_dict['flavors'] = list(wine_dict['flavors'])
+
+            if wine_dict['grape_varieties']:
+                wine_dict['grape_varieties'] = list(wine_dict['grape_varieties'])
+
+            if wine_dict['pairing_suggestions']:
+                wine_dict['pairing_suggestions'] = list(wine_dict['pairing_suggestions'])
+
+            if wine_dict['related_urls']:
+                wine_dict['related_urls'] = list(wine_dict['related_urls'])
+
+            wines.append(wine_dict)
+        return wines
     except Exception as e:
         print(f"Error retrieving wine entries from database: {e}")
         return []
@@ -410,7 +582,7 @@ if __name__ == '__main__':
           st.image(image, caption="Uploaded Wine Label", width=200)
           # Convert image to base64
           buffered = BytesIO()
-          image.save(buffered, format="JPEG")
+          image.save(buffered, format="JPEG", optimize=True, quality=50)
           encoded_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
           form_data['label_image'] = encoded_string
 
@@ -450,7 +622,7 @@ if __name__ == '__main__':
   # Main area for displaying wine data
   st.header("Wine Journal Entries")
   with st.spinner("Loading wine entries..."):
-    wines = get_all_wines(engine)
+    wines = get_latest_wines(engine)
     if wines:
         for wine in wines:
           st.subheader(wine['name'])

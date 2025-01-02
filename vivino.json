@@ -1,0 +1,790 @@
+{
+    "vintage": {
+        "id": 169938959,
+        "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2020",
+        "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2020",
+        "statistics": {
+            "status": "BelowThreshold",
+            "ratings_count": 3,
+            "ratings_average": 0,
+            "labels_count": 13,
+            "reviews_count": 1
+        },
+        "organic_certification_id": null,
+        "certified_biodynamic": null,
+        "image": {
+            "location": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pl_480x640.png",
+            "variations": {
+                "bottle_large": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pb_x960.png",
+                "bottle_medium": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pb_x600.png",
+                "bottle_medium_square": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pb_600x600.png",
+                "bottle_small": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pb_x300.png",
+                "bottle_small_square": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pb_300x300.png",
+                "label": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pl_480x640.png",
+                "label_large": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pl_375x500.png",
+                "label_medium": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pl_150x200.png",
+                "label_medium_square": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pl_150x150.png",
+                "label_small_square": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pl_80x80.png",
+                "large": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pl_375x500.png",
+                "medium": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pl_150x200.png",
+                "medium_square": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pl_150x150.png",
+                "small_square": "//images.vivino.com/thumbs/Jtok2Re7SnqeHaHY1UYBYw_pl_80x80.png"
+            }
+        },
+        "wine": {
+            "id": 1880979,
+            "name": "Good Times, Bad Times Beckstoffer To Kalon Vineyard",
+            "seo_name": "good-times-bad-times-beckstoffer-to-kalon-vineyard",
+            "type_id": 1,
+            "vintage_type": 0,
+            "is_natural": false,
+            "region": {
+                "id": 25,
+                "name": "Napa Valley",
+                "name_en": "",
+                "seo_name": "napa-valley",
+                "country": {
+                    "code": "us",
+                    "name": "United States",
+                    "native_name": "United States",
+                    "seo_name": "united-states",
+                    "currency": {
+                        "code": "USD",
+                        "name": "US Dollars",
+                        "prefix": "$",
+                        "suffix": null
+                    },
+                    "regions_count": 368,
+                    "users_count": 13204321,
+                    "wines_count": 216409,
+                    "wineries_count": 28666,
+                    "most_used_grapes": [{
+                        "id": 2,
+                        "name": "Cabernet Sauvignon",
+                        "seo_name": "cabernet-sauvignon",
+                        "has_detailed_info": true,
+                        "wines_count": 801751,
+                        "parent_grape_id": null
+                    }, {
+                        "id": 14,
+                        "name": "Pinot Noir",
+                        "seo_name": "pinot-noir",
+                        "has_detailed_info": true,
+                        "wines_count": 572334,
+                        "parent_grape_id": null
+                    }, {
+                        "id": 5,
+                        "name": "Chardonnay",
+                        "seo_name": "chardonnay",
+                        "has_detailed_info": true,
+                        "wines_count": 604208,
+                        "parent_grape_id": null
+                    }]
+                },
+                "parent_id": 2998,
+                "background_image": {
+                    "location": "//images.vivino.com/regions/backgrounds/cP8NlYVPSUStyROqZeBzgA.jpg",
+                    "variations": {
+                        "large": "//thumbs.vivino.com/region_backgrounds/cP8NlYVPSUStyROqZeBzgA_1280x760.jpg",
+                        "medium": "//thumbs.vivino.com/region_backgrounds/cP8NlYVPSUStyROqZeBzgA_600x356.jpg"
+                    }
+                },
+                "statistics": {
+                    "wineries_count": 4006,
+                    "wines_count": 24444,
+                    "sub_regions_count": 0,
+                    "parent_regions_count": 3
+                }
+            },
+            "review_status": 2,
+            "winery": {
+                "id": 9554,
+                "name": "World's End",
+                "seo_name": "world-s-end",
+                "status": 1,
+                "review_status": "Completed",
+                "background_image": null,
+                "statistics": {
+                    "ratings_count": 5856,
+                    "ratings_average": 4.2,
+                    "labels_count": 43493,
+                    "wines_count": 19
+                },
+                "region": {
+                    "id": 105,
+                    "name": "Rutherford",
+                    "name_en": "",
+                    "seo_name": "rutherford",
+                    "country": {
+                        "code": "us",
+                        "name": "United States",
+                        "native_name": "United States",
+                        "seo_name": "united-states",
+                        "currency": {
+                            "code": "USD",
+                            "name": "US Dollars",
+                            "prefix": "$",
+                            "suffix": null
+                        },
+                        "regions_count": 368,
+                        "users_count": 13204321,
+                        "wines_count": 216409,
+                        "wineries_count": 28666,
+                        "most_used_grapes": [{
+                            "id": 2,
+                            "name": "Cabernet Sauvignon",
+                            "seo_name": "cabernet-sauvignon",
+                            "has_detailed_info": true,
+                            "wines_count": 801751,
+                            "parent_grape_id": null
+                        }, {
+                            "id": 14,
+                            "name": "Pinot Noir",
+                            "seo_name": "pinot-noir",
+                            "has_detailed_info": true,
+                            "wines_count": 572334,
+                            "parent_grape_id": null
+                        }, {
+                            "id": 5,
+                            "name": "Chardonnay",
+                            "seo_name": "chardonnay",
+                            "has_detailed_info": true,
+                            "wines_count": 604208,
+                            "parent_grape_id": null
+                        }]
+                    },
+                    "parent_id": 25,
+                    "background_image": {
+                        "location": "//images.vivino.com/regions/backgrounds/YIECzf9JShax_qdsscwI2Q.jpg",
+                        "variations": {
+                            "large": "//thumbs.vivino.com/region_backgrounds/YIECzf9JShax_qdsscwI2Q_1280x760.jpg",
+                            "medium": "//thumbs.vivino.com/region_backgrounds/YIECzf9JShax_qdsscwI2Q_600x356.jpg"
+                        }
+                    },
+                    "class": {
+                        "typecast_map": {
+                            "background_image": {},
+                            "class": {},
+                            "location": {}
+                        }
+                    },
+                    "statistics": {
+                        "wineries_count": 113,
+                        "wines_count": 994,
+                        "sub_regions_count": 0,
+                        "parent_regions_count": 4
+                    }
+                },
+                "business_name": "World's End",
+                "description": "",
+                "specialists_notes": "",
+                "phone": "+33 5 57 84 64 22",
+                "email": "ali@maltus.com",
+                "facebook": "https://www.facebook.com/MaltusWines/",
+                "instagram": "@jcpmaltus",
+                "is_claimed": true,
+                "twitter": "@JCPMaltus",
+                "website": "http://www.maltus.com/",
+                "winemaker": "Jonathan Maltus",
+                "wine_maker": {
+                    "id": 1354,
+                    "name": "Jonathan Maltus"
+                },
+                "address": {
+                    "title": null,
+                    "name": null,
+                    "street": null,
+                    "street2": null,
+                    "neighborhood": null,
+                    "city": "Napa",
+                    "zip": "94581",
+                    "state": "California",
+                    "country": null,
+                    "company": null,
+                    "phone": null,
+                    "external_id": null,
+                    "residential": null,
+                    "vat_number": null,
+                    "vat_code": null,
+                    "addition": null
+                },
+                "image": {
+                    "location": "//images.vivino.com/wineries/9554/logos/JOwQ3WHkRQm_jIwue-NDtw.jpeg",
+                    "variations": {
+                        "large": "//thumbs.vivino.com/wineries/9554/logos/JOwQ3WHkRQm_jIwue-NDtw_500x500.jpeg",
+                        "medium": "//thumbs.vivino.com/wineries/9554/logos/JOwQ3WHkRQm_jIwue-NDtw_200x200.jpeg",
+                        "small_square": "//thumbs.vivino.com/wineries/9554/logos/JOwQ3WHkRQm_jIwue-NDtw_80x80.jpeg"
+                    }
+                },
+                "location": {
+                    "latitude": 44.493443,
+                    "longitude": -79.156044
+                },
+                "winery_group": {
+                    "id": 134,
+                    "name": "JCP Maltus",
+                    "website": "http://www.maltus.com/"
+                },
+                "first_wines": [],
+                "sponsored_entity_type": null,
+                "sponsored_entity": null,
+                "onboarding_status": null
+            },
+            "statistics": {
+                "status": "Normal",
+                "ratings_count": 643,
+                "ratings_average": 4.5,
+                "labels_count": 4046,
+                "vintages_count": 29
+            },
+            "rank": {
+                "country": {
+                    "description": "Rank within United States",
+                    "total": 189215,
+                    "rank": 936
+                },
+                "region": {
+                    "description": "Rank within Wine Region",
+                    "total": 1321,
+                    "rank": 57
+                },
+                "winery": {
+                    "description": "Rank within Winery",
+                    "total": 18,
+                    "rank": 1
+                },
+                "wine_type": {
+                    "description": "Rank within all Red Wine",
+                    "total": 740781,
+                    "rank": 1759
+                },
+                "global": {
+                    "description": "Global Rank",
+                    "total": 1510340,
+                    "rank": 2208
+                }
+            },
+            "hidden": false,
+            "vintages": [{
+                "id": 169938959,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2020",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2020",
+                "statistics": {
+                    "status": "BelowThreshold",
+                    "ratings_count": 3,
+                    "ratings_average": 0,
+                    "labels_count": 13,
+                    "reviews_count": 1
+                },
+                "year": 2020,
+                "grapes": null,
+                "has_valid_ratings": false
+            }, {
+                "id": 157802442,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2018",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2018",
+                "statistics": {
+                    "status": "Normal",
+                    "ratings_count": 54,
+                    "ratings_average": 4.3,
+                    "labels_count": 551,
+                    "reviews_count": 26
+                },
+                "year": 2018,
+                "grapes": null,
+                "has_valid_ratings": true
+            }, {
+                "id": 152191381,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2017",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2017",
+                "statistics": {
+                    "status": "Normal",
+                    "ratings_count": 26,
+                    "ratings_average": 4.4,
+                    "labels_count": 172,
+                    "reviews_count": 8
+                },
+                "year": 2017,
+                "grapes": null,
+                "has_valid_ratings": true
+            }, {
+                "id": 146739639,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2016",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2016",
+                "statistics": {
+                    "status": "Normal",
+                    "ratings_count": 34,
+                    "ratings_average": 4.4,
+                    "labels_count": 105,
+                    "reviews_count": 18
+                },
+                "year": 2016,
+                "grapes": null,
+                "has_valid_ratings": true
+            }, {
+                "id": 147918547,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2015",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2015",
+                "statistics": {
+                    "status": "Normal",
+                    "ratings_count": 26,
+                    "ratings_average": 4.4,
+                    "labels_count": 82,
+                    "reviews_count": 9
+                },
+                "year": 2015,
+                "grapes": null,
+                "has_valid_ratings": true
+            }, {
+                "id": 28770577,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2014",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2014",
+                "statistics": {
+                    "status": "Normal",
+                    "ratings_count": 216,
+                    "ratings_average": 4.5,
+                    "labels_count": 1738,
+                    "reviews_count": 94
+                },
+                "year": 2014,
+                "grapes": null,
+                "has_valid_ratings": true
+            }, {
+                "id": 21809437,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2013",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2013",
+                "statistics": {
+                    "status": "BelowThreshold",
+                    "ratings_count": 1,
+                    "ratings_average": 0,
+                    "labels_count": 3,
+                    "reviews_count": 1
+                },
+                "year": 2013,
+                "grapes": null,
+                "has_valid_ratings": false
+            }, {
+                "id": 21809410,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2012",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2012",
+                "statistics": {
+                    "status": "BelowThreshold",
+                    "ratings_count": 1,
+                    "ratings_average": 0,
+                    "labels_count": 2,
+                    "reviews_count": 1
+                },
+                "year": 2012,
+                "grapes": null,
+                "has_valid_ratings": false
+            }, {
+                "id": 6878508,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2010",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2010",
+                "statistics": {
+                    "status": "Normal",
+                    "ratings_count": 79,
+                    "ratings_average": 4.4,
+                    "labels_count": 484,
+                    "reviews_count": 32
+                },
+                "year": 2010,
+                "grapes": null,
+                "has_valid_ratings": true
+            }, {
+                "id": 3215637,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2009",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2009",
+                "statistics": {
+                    "status": "Normal",
+                    "ratings_count": 91,
+                    "ratings_average": 4.5,
+                    "labels_count": 514,
+                    "reviews_count": 39
+                },
+                "year": 2009,
+                "grapes": null,
+                "has_valid_ratings": true
+            }, {
+                "id": 5171590,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2008",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2008",
+                "statistics": {
+                    "status": "Normal",
+                    "ratings_count": 51,
+                    "ratings_average": 4.4,
+                    "labels_count": 232,
+                    "reviews_count": 23
+                },
+                "year": 2008,
+                "grapes": null,
+                "has_valid_ratings": true
+            }, {
+                "id": 6889923,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2007",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2007",
+                "statistics": {
+                    "status": "BelowThreshold",
+                    "ratings_count": 1,
+                    "ratings_average": 0,
+                    "labels_count": 2,
+                    "reviews_count": 0
+                },
+                "year": 2007,
+                "grapes": null,
+                "has_valid_ratings": false
+            }, {
+                "id": 16390471,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2006",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2006",
+                "statistics": {
+                    "status": "BelowThreshold",
+                    "ratings_count": 1,
+                    "ratings_average": 0,
+                    "labels_count": 0,
+                    "reviews_count": 1
+                },
+                "year": 2006,
+                "grapes": null,
+                "has_valid_ratings": false
+            }, {
+                "id": 3154694,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-2001",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard 2001",
+                "statistics": {
+                    "status": "BelowThreshold",
+                    "ratings_count": 1,
+                    "ratings_average": 0,
+                    "labels_count": 5,
+                    "reviews_count": 0
+                },
+                "year": 2001,
+                "grapes": null,
+                "has_valid_ratings": false
+            }, {
+                "id": 4145251,
+                "seo_name": "world-s-end-good-times-bad-times-beckstoffer-to-kalon-vineyard-uv",
+                "name": "World's End Good Times, Bad Times Beckstoffer To Kalon Vineyard",
+                "statistics": {
+                    "status": "Normal",
+                    "ratings_count": 643,
+                    "ratings_average": 4.5,
+                    "labels_count": 10,
+                    "reviews_count": 19
+                },
+                "year": 0,
+                "grapes": null,
+                "has_valid_ratings": true
+            }],
+            "description": "",
+            "grapes": [{
+                "id": 2,
+                "name": "Cabernet Sauvignon",
+                "seo_name": "cabernet-sauvignon",
+                "has_detailed_info": true,
+                "wines_count": 801751,
+                "parent_grape_id": null
+            }],
+            "foods": [{
+                "id": 4,
+                "name": "Beef",
+                "weight": 0.5,
+                "background_image": {
+                    "location": "//images.vivino.com/backgrounds/foods/4_beef.png",
+                    "variations": {
+                        "small": "//images.vivino.com/backgrounds/foods/thumbs/4_beef_932x810.png"
+                    }
+                },
+                "seo_name": "beef"
+            }, {
+                "id": 8,
+                "name": "Lamb",
+                "weight": 0.5,
+                "background_image": {
+                    "location": "//images.vivino.com/backgrounds/foods/8_lamb.png",
+                    "variations": {
+                        "small": "//images.vivino.com/backgrounds/foods/thumbs/8_lamb_932x810.png"
+                    }
+                },
+                "seo_name": "lamb"
+            }, {
+                "id": 20,
+                "name": "Poultry",
+                "weight": 0.5,
+                "background_image": {
+                    "location": "//images.vivino.com/backgrounds/foods/20_chicken.png",
+                    "variations": {
+                        "small": "//images.vivino.com/backgrounds/foods/thumbs/20_chicken_932x810.png"
+                    }
+                },
+                "seo_name": "poultry"
+            }, {
+                "id": 11,
+                "name": "Game (deer, venison)",
+                "weight": 0,
+                "background_image": {
+                    "location": "//images.vivino.com/backgrounds/foods/11_venison.png",
+                    "variations": {
+                        "small": "//images.vivino.com/backgrounds/foods/thumbs/11_venison_932x810.png"
+                    }
+                },
+                "seo_name": "game"
+            }, {
+                "id": 17,
+                "name": "Mature and hard cheese",
+                "weight": 0,
+                "background_image": {
+                    "location": "//images.vivino.com/backgrounds/foods/17_hardcheese.png",
+                    "variations": {
+                        "small": "//images.vivino.com/backgrounds/foods/thumbs/17_hardcheese_932x810.png"
+                    }
+                },
+                "seo_name": null
+            }],
+            "non_vintage": false,
+            "alcohol": 14,
+            "sweetness_id": null,
+            "closure": null,
+            "vintage_mask_raw": null,
+            "updated_at": "2021-01-12T22:39:04Z",
+            "created_at": "2013-10-01T05:08:36Z",
+            "is_first_wine": false,
+            "style": {
+                "id": 289,
+                "seo_name": "napa-valley-cabernet-sauvignon",
+                "regional_name": "Napa Valley",
+                "varietal_name": "Cabernet Sauvignon",
+                "name": "Napa Valley Cabernet Sauvignon",
+                "background_image": null,
+                "image": null,
+                "description": null,
+                "blurb": null,
+                "interesting_facts": null,
+                "body": 5,
+                "body_description": "Very full-bodied",
+                "acidity": 2,
+                "acidity_description": "Medium",
+                "country": {
+                    "code": "us",
+                    "name": "United States",
+                    "native_name": "United States",
+                    "seo_name": "united-states",
+                    "currency": {
+                        "code": "USD",
+                        "name": "US Dollars",
+                        "prefix": "$",
+                        "suffix": null
+                    },
+                    "regions_count": 368,
+                    "users_count": 13204321,
+                    "wines_count": 216409,
+                    "wineries_count": 28666,
+                    "most_used_grapes": [{
+                        "id": 2,
+                        "name": "Cabernet Sauvignon",
+                        "seo_name": "cabernet-sauvignon",
+                        "has_detailed_info": true,
+                        "wines_count": 801751,
+                        "parent_grape_id": null
+                    }, {
+                        "id": 14,
+                        "name": "Pinot Noir",
+                        "seo_name": "pinot-noir",
+                        "has_detailed_info": true,
+                        "wines_count": 572334,
+                        "parent_grape_id": null
+                    }, {
+                        "id": 5,
+                        "name": "Chardonnay",
+                        "seo_name": "chardonnay",
+                        "has_detailed_info": true,
+                        "wines_count": 604208,
+                        "parent_grape_id": null
+                    }]
+                },
+                "wine_type_id": 1,
+                "food": [{
+                    "id": 4,
+                    "name": "Beef",
+                    "weight": 0.5,
+                    "background_image": {
+                        "location": "//images.vivino.com/backgrounds/foods/4_beef.png",
+                        "variations": {
+                            "small": "//images.vivino.com/backgrounds/foods/thumbs/4_beef_932x810.png"
+                        }
+                    },
+                    "seo_name": "beef"
+                }, {
+                    "id": 8,
+                    "name": "Lamb",
+                    "weight": 0.5,
+                    "background_image": {
+                        "location": "//images.vivino.com/backgrounds/foods/8_lamb.png",
+                        "variations": {
+                            "small": "//images.vivino.com/backgrounds/foods/thumbs/8_lamb_932x810.png"
+                        }
+                    },
+                    "seo_name": "lamb"
+                }, {
+                    "id": 11,
+                    "name": "Game (deer, venison)",
+                    "weight": 0,
+                    "background_image": {
+                        "location": "//images.vivino.com/backgrounds/foods/11_venison.png",
+                        "variations": {
+                            "small": "//images.vivino.com/backgrounds/foods/thumbs/11_venison_932x810.png"
+                        }
+                    },
+                    "seo_name": "game"
+                }, {
+                    "id": 17,
+                    "name": "Mature and hard cheese",
+                    "weight": 0,
+                    "background_image": {
+                        "location": "//images.vivino.com/backgrounds/foods/17_hardcheese.png",
+                        "variations": {
+                            "small": "//images.vivino.com/backgrounds/foods/thumbs/17_hardcheese_932x810.png"
+                        }
+                    },
+                    "seo_name": null
+                }, {
+                    "id": 20,
+                    "name": "Poultry",
+                    "weight": 0.5,
+                    "background_image": {
+                        "location": "//images.vivino.com/backgrounds/foods/20_chicken.png",
+                        "variations": {
+                            "small": "//images.vivino.com/backgrounds/foods/thumbs/20_chicken_932x810.png"
+                        }
+                    },
+                    "seo_name": "poultry"
+                }],
+                "grapes": [{
+                    "id": 2,
+                    "name": "Cabernet Sauvignon",
+                    "seo_name": "cabernet-sauvignon",
+                    "has_detailed_info": true,
+                    "wines_count": 801751,
+                    "parent_grape_id": null
+                }],
+                "region": {
+                    "id": 25,
+                    "name": "Napa Valley",
+                    "name_en": "",
+                    "seo_name": "napa-valley",
+                    "country": {
+                        "code": "us",
+                        "name": "United States",
+                        "native_name": "United States",
+                        "seo_name": "united-states",
+                        "currency": {
+                            "code": "USD",
+                            "name": "US Dollars",
+                            "prefix": "$",
+                            "suffix": null
+                        },
+                        "regions_count": 368,
+                        "users_count": 13204321,
+                        "wines_count": 216409,
+                        "wineries_count": 28666,
+                        "most_used_grapes": [{
+                            "id": 2,
+                            "name": "Cabernet Sauvignon",
+                            "seo_name": "cabernet-sauvignon",
+                            "has_detailed_info": true,
+                            "wines_count": 801751,
+                            "parent_grape_id": null
+                        }, {
+                            "id": 14,
+                            "name": "Pinot Noir",
+                            "seo_name": "pinot-noir",
+                            "has_detailed_info": true,
+                            "wines_count": 572334,
+                            "parent_grape_id": null
+                        }, {
+                            "id": 5,
+                            "name": "Chardonnay",
+                            "seo_name": "chardonnay",
+                            "has_detailed_info": true,
+                            "wines_count": 604208,
+                            "parent_grape_id": null
+                        }]
+                    },
+                    "parent_id": 2998,
+                    "background_image": {
+                        "location": "//images.vivino.com/regions/backgrounds/cP8NlYVPSUStyROqZeBzgA.jpg",
+                        "variations": {
+                            "large": "//thumbs.vivino.com/region_backgrounds/cP8NlYVPSUStyROqZeBzgA_1280x760.jpg",
+                            "medium": "//thumbs.vivino.com/region_backgrounds/cP8NlYVPSUStyROqZeBzgA_600x356.jpg"
+                        }
+                    },
+                    "statistics": {
+                        "wineries_count": 4006,
+                        "wines_count": 24444,
+                        "sub_regions_count": 16,
+                        "parent_regions_count": 3
+                    }
+                },
+                "parent_style_id": 32,
+                "hidden": false,
+                "statistics": {
+                    "wines_count": 9252,
+                    "aggregated_wines_count": 9252
+                },
+                "vintage_mask": "1\u003c",
+                "baseline_structure": {
+                    "acidity": 3.5,
+                    "fizziness": null,
+                    "intensity": 5.0,
+                    "sweetness": 1.0,
+                    "tannin": 4.0
+                }
+            },
+            "has_valid_ratings": true
+        },
+        "description": "",
+        "wine_critic_reviews": [],
+        "awards": [],
+        "ratings_distribution": {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "4": 2,
+            "5": 1
+        },
+        "ranking": {
+            "country": {
+                "description": "Rank within United States",
+                "total": 1222669,
+                "rank": 853152
+            },
+            "region": {
+                "description": "Rank within Wine Region",
+                "total": 14725,
+                "rank": 10865
+            },
+            "winery": {
+                "description": "Rank within Winery",
+                "total": 168,
+                "rank": 145
+            },
+            "global": {
+                "description": "Global Rank",
+                "total": 11192991,
+                "rank": 8126257
+            }
+        },
+        "recommended_drinking_window": {
+            "start_year": 2024,
+            "end_year": 2040,
+            "status": 4
+        },
+        "wine_facts": {},
+        "winemaker": null,
+        "wine_maker": null,
+        "grape_composition": {},
+        "year": 2020,
+        "grapes": null,
+        "has_valid_ratings": false
+    }
+}

@@ -1,0 +1,155 @@
+{
+"@context":"https:\/\/schema.org\/",
+"@type":"Product",
+"name":"2020 Chateau Cormeil Figeac",
+"description":"Critic tasting note: (2020 vintage) \"This wine is young, firm and still densely structured. Black fruits shot with succulent acidity and rich tannins indicate aging potential. Drink this wine from 2026.\" - <i>91\/100<\/i>, <i>Wine Enthusiast<\/i>",
+"countryOfOrigin":{
+    "@type":"Country",
+    "name":"Saint-Emilion Grand Cru, France"
+},
+"model":"2020 Vintage",
+"brand":{
+    "@type":"Brand",
+    "name":"Chateau Cormeil Figeac"
+},
+"mpn":"567e58e1df2352423b73a1d7f02e2003",
+"sku":"9bbd0c7a3c04fcf4a26305f5f8795bc8",
+"image":"\/images\/labels\/18\/11\/10651811.jpg",
+"aggregateRating":{
+    "@type":"AggregateRating",
+    "worstRating":1,
+    "ratingCount":3,
+    "ratingValue":93,
+    "bestRating":100
+},
+"category":[
+    {
+        "@type":"Thing",
+        "name":"Saint-Emilion Grand Cru",
+        "url":"https:\/\/www.wine-searcher.com\/regions-saint-emilion+grand+cru",
+        "image":"\/images\/region\/saint-emilion-grand-cru-5972-1-3.jpg",
+        "disambiguatingDescription":"Region"
+    },{
+        "@type":"Thing",
+        "name":"Red - Savory and Classic",
+        "url":"https:\/\/www.wine-searcher.com\/styles-2-red-savory-and-classic",
+        "image":"\/images\/wine_style\/red-savory-and-classic-2-2-2.jpg",
+        "disambiguatingDescription":"Style"
+    },{
+        "@type":"Thing",
+        "name":"Cabernet Franc - Merlot",
+        "url":"https:\/\/www.wine-searcher.com\/grape-1756-cabernet-franc-merlot",
+        "image":"\/images\/grape\/cabernet-franc-merlot-1756-1-1.jpg",
+        "disambiguatingDescription":"Grape Variety \/ Blend"
+    }
+],
+"offers":[
+    {
+        "@type":"Offer",
+        "price":"166.66",
+        "description":"5ltr",
+        "priceCurrency":"USD",
+        "itemCondition":"https:\/\/schema.org\/NewCondition",
+        "availability":"InStock",
+        "priceValidUntil":"2024-12-17T15:15:04Z",
+        "url":"http:\/\/www.pierre-wyss.ch\/WDwebNeg",
+        "name":"CORMEIL FIGEAC, ROUGE, SAINT-EMILION GRAND CRU - Grand Cru - Chateau CORMEIL FIGEAC","sku":"8cd45f0d1906aa3827953332e952b29f",
+        "seller":{
+            "@type":"Organization",
+            "name":"Pierre Wyss",
+            "description":"",
+            "availableDeliveryMethod":"",
+            "address":{
+                "@type":"PostalAddress",
+                "addressRegion":"Bern",
+                "addressCountry":{
+                    "@type":"Country","name":"Switzerland"
+                }
+            }
+        }
+    },{
+        "@type":"Offer",
+        "price":"25.18",
+        "description":"Bottle (750ml)",
+        "priceCurrency":"USD",
+        "itemCondition":"https:\/\/schema.org\/NewCondition",
+        "availability":"InStock",
+        "priceValidUntil":"2024-12-17T15:15:04Z",
+        "url":"http:\/\/www.pierre-wyss.ch\/WDwebNeg",
+        "name":"CORMEIL FIGEAC, ROUGE, SAINT-EMILION GRAND CRU - Grand Cru - Chateau CORMEIL FIGEAC","sku":"92c7eaa2f9a077d7a96f02ea3556ede4",
+        "seller":{
+            "@type":"Organization",
+            "name":"Pierre Wyss",
+            "description":"",
+            "availableDeliveryMethod":"",
+            "address":{
+                "@type":"PostalAddress",
+                "addressRegion":"Bern",
+                "addressCountry":{
+                    "@type":"Country",
+                    "name":"Switzerland"
+                }
+            }
+        }
+    }
+],
+"review":[
+    {
+        "@type":"CriticReview",
+        "author":{
+            "@type":"Organization",
+            "name":"Wine Enthusiast"
+        },
+        "reviewBody":"Tasted: Apr 2023. This wine is young, firm and still densely structured. Black fruits shot with succulent acidity and rich tannins indicate aging potential. Drink this wine from 2026.","itemReviewed":{
+            "@type":"IndividualProduct",
+            "additionalType":2020,
+            "name":"2020 Chateau Cormeil Figeac"
+        },
+        "reviewRating":{
+            "@type":"Rating",
+            "worstRating":1,
+            "ratingValue":91,
+            "bestRating":100,
+            "reviewAspect":"Tasting Note"
+        }
+    },{
+        "@type":"CriticReview",
+        "author":{
+            "@type":"Organization",
+            "name":"Decanter World Wine Awards"
+        },
+        "reviewBody":"",
+        "itemReviewed":{
+            "@type":"IndividualProduct",
+            "additionalType":2020,
+            "name":"2020 Chateau Cormeil Figeac"
+        },
+        "reviewRating":{
+            "@type":"Rating",
+            "worstRating":1,
+            "ratingValue":96,
+            "bestRating":100,
+            "reviewAspect":"Tasting Note"
+        }
+    },{
+        "@type":"CriticReview",
+        "author":{
+            "@type":"Organization",
+            "name":"CellarTracker"
+        },
+        "reviewBody":"",
+        "itemReviewed":{
+            "@type":"IndividualProduct",
+            "additionalType":2020,
+            "name":"2020 Chateau Cormeil Figeac"
+        },
+        "reviewRating":{
+            "@type":"Rating",
+            "worstRating":1,
+            "ratingValue":92,
+            "bestRating":100,
+            "reviewAspect":"Tasting Note"
+        }
+    }
+]
+}

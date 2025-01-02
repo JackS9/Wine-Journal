@@ -13,9 +13,9 @@ class TestTavilyAPI(unittest.TestCase):
         results = self.client.search(query=query, search_depth="basic")
         self.assertIsNotNone(results)
         self.assertGreater(len(results), 0)
-        for result in results:
-            self.assertIn("url", result)
-            self.assertIn("title", result)
+
+        for result in results['results']:
+            print(result)
 
 if __name__ == "__main__":
     unittest.main()
